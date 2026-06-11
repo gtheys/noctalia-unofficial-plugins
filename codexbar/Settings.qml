@@ -1,0 +1,230 @@
+import QtQuick
+import QtQuick.Layouts
+import qs.Commons
+import qs.Widgets
+import "codexbar.js" as CodexBar
+
+ColumnLayout {
+    id: root
+
+    property var pluginApi: null
+    property bool loaded: false
+    property string provider: "codex"
+    property string codexbarPath: "codexbar"
+    property string codexbarSource: "cli"
+    property int refreshIntervalSec: 60
+
+    spacing: Style.marginL
+
+    function loadSettings() {
+        var defaults = pluginApi && pluginApi.manifest && pluginApi.manifest.metadata
+            ? pluginApi.manifest.metadata.defaultSettings || {}
+            : {}
+        var settings = pluginApi && pluginApi.pluginSettings ? pluginApi.pluginSettings : defaults
+        loaded = false
+        provider = settings.provider || defaults.provider || "zai"
+        codexbarPath = settings.codexbarPath || defaults.codexbarPath || "codexbar"
+        codexbarSource = settings.codexbarSource || defaults.codexbarSource || "auto"
+        refreshIntervalSec = Number(settings.refreshIntervalSec !== undefined ? settings.refreshIntervalSec : (defaults.refreshIntervalSec !== undefined ? defaults.refreshIntervalSec : 60))
+        if (isNaN(refreshIntervalSec))
+            refreshIntervalSec = 60
+        loaded = true
+    }
+
+    function saveSettings() {
+        if (!pluginApi || !loaded)
+            return
+        pluginApi.pluginSettings.provider = provider.trim() !== "" ? provider.trim() : "zai"
+        pluginApi.pluginSettings.codexbarPath = codexbarPath.trim() !== "" ? codexbarPath.trim() : "codexbar"
+        pluginApi.pluginSettings.codexbarSource = codexbarSource.trim() !== "" ? codexbarSource.trim() : "auto"
+        pluginApi.pluginSettings.refreshIntervalSec = Math.max(5, Number(refreshIntervalSec))
+        pluginApi.saveSettings()
+    }
+
+    Component.onCompleted: loadSettings()
+    onPluginApiChanged: loadSettings()
+
+    NText {
+        text: pluginApi?.tr("settings.title")
+        pointSize: Style.fontSizeXL
+        font.weight: Style.fontWeightBold
+        color: Color.mOnSurface
+        Layout.fillWidth: true
+    }
+
+    Rectangle {
+        Layout.fillWidth: true
+        color: Color.mSurfaceVariant
+        radius: Style.radiusS
+        implicitHeight: content.implicitHeight + Style.marginXL
+
+        ColumnLayout {
+            id: content
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: parent.top
+                margins: Style.marginL
+            }
+            spacing: Style.marginM
+
+            NText {
+                text: pluginApi?.tr("settings.cli-section")
+                pointSize: Style.fontSizeL
+                font.weight: Style.fontWeightSemiBold
+                color: Color.mPrimary
+                Layout.fillWidth: true
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: Style.marginXS
+
+                NText {
+                    text: pluginApi?.tr("settings.provider.label")
+                    pointSize: Style.fontSizeM
+                    font.weight: Style.fontWeightSemiBold
+                    color: Color.mOnSurface
+                    Layout.fillWidth: true
+                }
+
+                NText {
+                    text: pluginApi?.tr("settings.provider.description")
+                    pointSize: Style.fontSizeXS
+                    color: Color.mOnSurfaceVariant
+                    wrapMode: Text.WordWrap
+                    Layout.fillWidth: true
+                }
+
+                NComboBox {
+                    Layout.fillWidth: true
+                    model: [
+                        { key: "codex",     name: "Codex" },
+                        { key: "zai",       name: "Zai" },
+                        { key: "claude",    name: "Claude" },
+                        { key: "cursor",    name: "Cursor" },
+                        { key: "copilot",   name: "Copilot" },
+                        { key: "openai",    name: "OpenAI" },
+                        { key: "gemini",    name: "Gemini" },
+                        { key: "opencode",  name: "OpenCode" },
+                        { key: "kilo",      name: "Kilo" },
+                        { key: "amp",       name: "Amp" }
+                    ]
+                    currentKey: root.provider
+                    onSelected: key => {
+                        root.provider = key
+                        root.saveSettings()
+                    }
+                }
+            }
+
+            NTextInput {
+                Layout.fillWidth: true
+                label: pluginApi?.tr("settings.codexbar-path.label")
+                description: pluginApi?.tr("settings.codexbar-path.description")
+                placeholderText: "codexbar"
+                text: root.codexbarPath
+                onTextChanged: {
+                    root.codexbarPath = text
+                    root.saveSettings()
+                }
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: Style.marginXS
+
+                NText {
+                    text: pluginApi?.tr("settings.source.label")
+                    pointSize: Style.fontSizeM
+                    font.weight: Style.fontWeightSemiBold
+                    color: Color.mOnSurface
+                    Layout.fillWidth: true
+                }
+
+                NText {
+                    text: pluginApi?.tr("settings.source.description")
+                    pointSize: Style.fontSizeXS
+                    color: Color.mOnSurfaceVariant
+                    wrapMode: Text.WordWrap
+                    Layout.fillWidth: true
+                }
+
+                NComboBox {
+                    Layout.fillWidth: true
+                    model: [
+                        { key: "cli", name: "CLI" },
+                        { key: "auto", name: "Auto" },
+                        { key: "web", name: "Web" },
+                        { key: "oauth", name: "OAuth" },
+                        { key: "api", name: "API" }
+                    ]
+                    currentKey: root.codexbarSource
+                    onSelected: key => {
+                        root.codexbarSource = key
+                        root.saveSettings()
+                    }
+                }
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: Style.marginXS
+
+                NText {
+                    text: pluginApi?.tr("settings.refresh-interval")
+                    pointSize: Style.fontSizeM
+                    font.weight: Style.fontWeightSemiBold
+                    color: Color.mOnSurface
+                    Layout.fillWidth: true
+                }
+
+                NSpinBox {
+                    from: 5
+                    to: 3600
+                    stepSize: 5
+                    value: root.refreshIntervalSec
+                    onValueChanged: {
+                        root.refreshIntervalSec = value
+                        root.saveSettings()
+                    }
+                }
+            }
+        }
+    }
+
+    Rectangle {
+        Layout.fillWidth: true
+        radius: Style.radiusS
+        color: Qt.alpha(Color.mPrimary, 0.10)
+        implicitHeight: commandColumn.implicitHeight + Style.marginXL
+
+        ColumnLayout {
+            id: commandColumn
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: parent.top
+                margins: Style.marginL
+            }
+            spacing: Style.marginS
+
+            NText {
+                text: pluginApi?.tr("settings.command-preview")
+                pointSize: Style.fontSizeM
+                font.weight: Style.fontWeightSemiBold
+                color: Color.mPrimary
+                Layout.fillWidth: true
+            }
+
+            NText {
+                text: CodexBar.command(root.pluginApi).join(" ")
+                pointSize: Style.fontSizeXS
+                color: Color.mOnSurface
+                font.family: "monospace"
+                wrapMode: Text.WrapAnywhere
+                Layout.fillWidth: true
+            }
+        }
+    }
+}

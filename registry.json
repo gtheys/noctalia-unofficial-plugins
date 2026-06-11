@@ -1,0 +1,78 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-06-11T12:50:49+00:00",
+  "repositoryUrl": "https://github.com/gtheys/noctalia-unofficial-plugins",
+  "plugins": [
+    {
+      "id": "codexbar",
+      "name": "Codex Usage",
+      "version": "1.0.0",
+      "minNoctaliaVersion": "4.6.0",
+      "author": "Geert Theys",
+      "license": "MIT",
+      "repository": "https://github.com/gtheys/noctalia-unofficial-plugins",
+      "description": "Codex usage limits in the Noctalia bar via CodexBar CLI.",
+      "tags": [
+        "Bar",
+        "Panel",
+        "AI",
+        "Development",
+        "Indicator"
+      ],
+      "entryPoints": {
+        "barWidget": "BarWidget.qml",
+        "panel": "Panel.qml",
+        "settings": "Settings.qml"
+      },
+      "dependencies": {
+        "plugins": []
+      },
+      "metadata": {
+        "icon": "ai",
+        "name": "CodexBar",
+        "description": "Codex rate-limit usage from codexbar usage --source cli",
+        "defaultSettings": {
+          "provider": "zai",
+          "refreshIntervalSec": 60,
+          "codexbarPath": "codexbar",
+          "codexbarSource": "api"
+        }
+      },
+      "sourceUrl": "https://github.com/gtheys/noctalia-unofficial-plugins/tree/main/codexbar",
+      "downloadUrl": "https://github.com/gtheys/noctalia-unofficial-plugins/archive/refs/heads/main.zip",
+      "pluginPath": "codexbar"
+    },
+    {
+      "id": "easyeffects",
+      "name": "Easy Effects Profile Switcher",
+      "version": "1.0.4",
+      "minNoctaliaVersion": "4.0.0",
+      "author": "gtheys",
+      "license": "MIT",
+      "repository": "https://github.com/gtheys/noctalia-unofficial-plugins",
+      "description": "Quick switch between Easy Effects output and input audio profiles.",
+      "tags": [
+        "Bar",
+        "Audio"
+      ],
+      "entryPoints": {
+        "main": "Main.qml",
+        "barWidget": "BarWidget.qml",
+        "panel": "Panel.qml",
+        "settings": "Settings.qml"
+      },
+      "dependencies": {
+        "plugins": []
+      },
+      "metadata": {
+        "defaultSettings": {
+          "currentOutputIndex": -1,
+          "currentInputIndex": -1
+        }
+      },
+      "sourceUrl": "https://github.com/gtheys/noctalia-unofficial-plugins/tree/main/easyeffects",
+      "downloadUrl": "https://github.com/gtheys/noctalia-unofficial-plugins/archive/refs/heads/main.zip",
+      "pluginPath": "easyeffects"
+    }
+  ]
+}

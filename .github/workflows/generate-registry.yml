@@ -1,0 +1,34 @@
+name: Generate Registry
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**/manifest.json"
+      - "scripts/generate-registry.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate registry.json
+        run: python3 scripts/generate-registry.py
+
+      - name: Commit registry.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add registry.json
+          git diff --cached --quiet || git commit -m "chore: regenerate registry.json [skip ci]"
+          git push

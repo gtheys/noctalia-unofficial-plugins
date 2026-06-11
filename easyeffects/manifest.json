@@ -1,0 +1,26 @@
+{
+  "id": "easyeffects",
+  "name": "Easy Effects Profile Switcher",
+  "version": "1.0.4",
+  "minNoctaliaVersion": "4.0.0",
+  "author": "gtheys",
+  "license": "MIT",
+  "repository": "https://github.com/gtheys/noctalia-unofficial-plugins",
+  "description": "Quick switch between Easy Effects output and input audio profiles.",
+  "tags": ["Bar", "Audio"],
+  "entryPoints": {
+    "main": "Main.qml",
+    "barWidget": "BarWidget.qml",
+    "panel": "Panel.qml",
+    "settings": "Settings.qml"
+  },
+  "dependencies": {
+    "plugins": []
+  },
+  "metadata": {
+    "defaultSettings": {
+      "currentOutputIndex": -1,
+      "currentInputIndex": -1
+    }
+  }
+}
