@@ -16,11 +16,16 @@ function setting(pluginApi, key, fallback) {
 }
 
 function command(pluginApi) {
+    var provider = setting(pluginApi, "provider", "zai")
+    // AIDEV-NOTE: opencodego only supports --source auto (api/cli/oauth/web all error
+    // "Source '<x>' is not supported for opencodego"). Force it regardless of the
+    // user's global codexbarSource setting.
+    var source = provider === "opencodego" ? "auto" : setting(pluginApi, "codexbarSource", "auto")
     return [
         setting(pluginApi, "codexbarPath", "codexbar"),
         "usage",
-        "--provider", setting(pluginApi, "provider", "zai"),
-        "--source", setting(pluginApi, "codexbarSource", "auto"),
+        "--provider", provider,
+        "--source", source,
         "--format", "json"
     ]
 }

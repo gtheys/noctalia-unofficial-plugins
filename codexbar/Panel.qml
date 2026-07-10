@@ -23,21 +23,18 @@ Item {
     property string currentProvider: "zai"
 
     readonly property var activeCommand: {
+        // AIDEV-NOTE: opencodego's --source auto override lives in CodexBar.command()
+        // so both Panel and BarWidget stay in sync.
         var cmd = CodexBar.command(root.pluginApi)
         var i = cmd.indexOf("--provider")
         if (i >= 0 && root.currentProvider !== "") {
             var c = cmd.slice()
             c[i + 1] = root.currentProvider
-            cmd = c
-        }
-        // AIDEV-NOTE: opencodego only supports --source auto (api/cli/oauth/web all error).
-        // Force it regardless of the user's global codexbarSource setting.
-        if (root.currentProvider === "opencodego") {
-            var s = cmd.indexOf("--source")
-            if (s >= 0) {
-                cmd = cmd.slice()
-                cmd[s + 1] = "auto"
+            if (root.currentProvider === "opencodego") {
+                var s = c.indexOf("--source")
+                if (s >= 0) c[s + 1] = "auto"
             }
+            cmd = c
         }
         return cmd
     }

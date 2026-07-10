@@ -80,6 +80,11 @@ Item {
     Process {
         id: codexbarProcess
         command: CodexBar.command(root.pluginApi)
+        // AIDEV-NOTE: pluginSettings is reassigned wholesale on save (see PluginService),
+        // so this binding re-evaluates and commandChanged fires when the provider chip
+        // is switched in Panel.qml. Without this the bar icon stayed stale until the
+        // next refreshIntervalMs timer tick.
+        onCommandChanged: root.refresh()
         // AIDEV-NOTE: workingDirectory set to avoid shell-init getcwd error (same fix as Panel.qml)
         workingDirectory: Quickshell.shellDir
         running: false
