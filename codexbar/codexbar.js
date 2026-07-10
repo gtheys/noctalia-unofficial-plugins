@@ -19,7 +19,7 @@ function command(pluginApi) {
     return [
         setting(pluginApi, "codexbarPath", "codexbar"),
         "usage",
-        "--provider", setting(pluginApi, "provider", "codex"),
+        "--provider", setting(pluginApi, "provider", "zai"),
         "--source", setting(pluginApi, "codexbarSource", "auto"),
         "--format", "json"
     ]

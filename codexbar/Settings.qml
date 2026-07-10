@@ -99,16 +99,17 @@ ColumnLayout {
                 NComboBox {
                     Layout.fillWidth: true
                     model: [
-                        { key: "codex",     name: "Codex" },
-                        { key: "zai",       name: "Zai" },
-                        { key: "claude",    name: "Claude" },
-                        { key: "cursor",    name: "Cursor" },
-                        { key: "copilot",   name: "Copilot" },
-                        { key: "openai",    name: "OpenAI" },
-                        { key: "gemini",    name: "Gemini" },
-                        { key: "opencode",  name: "OpenCode" },
-                        { key: "kilo",      name: "Kilo" },
-                        { key: "amp",       name: "Amp" }
+                        { key: "zai",         name: "Zai" },
+                        { key: "claude",      name: "Claude" },
+                        { key: "cursor",      name: "Cursor" },
+                        { key: "copilot",     name: "Copilot" },
+                        { key: "openai",      name: "OpenAI" },
+                        { key: "gemini",      name: "Gemini" },
+                        { key: "opencode",    name: "OpenCode" },
+                        { key: "opencodego",  name: "OpenCode Go" },
+                        { key: "openrouter",  name: "OpenRouter" },
+                        { key: "kilo",        name: "Kilo" },
+                        { key: "amp",         name: "Amp" }
                     ]
                     currentKey: root.provider
                     onSelected: key => {
