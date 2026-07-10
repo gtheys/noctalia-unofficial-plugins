@@ -35,7 +35,8 @@ Item {
         width: root.contentWidth
         height: root.contentHeight
         radius: Style.radiusM
-        color: Style.capsuleColor
+        // AIDEV-NOTE: hover highlights capsule (Color.mHover) and flips text/icon to black for contrast
+        color: mouseArea.containsMouse ? Color.mHover : Style.capsuleColor
         border.color: Style.capsuleBorderColor
         border.width: Style.capsuleBorderWidth
 
@@ -51,7 +52,7 @@ Item {
 
                 NIcon {
                     icon: "audio-waveform"
-                    color: Color.mOnSurface
+                    color: mouseArea.containsMouse ? "black" : Color.mOnSurface
                 }
 
                 NText {
@@ -62,7 +63,7 @@ Item {
                         return (inp !== "None") ? out + " / " + inp : out
                     }
                     pointSize: Style.fontSizeXS
-                    color: Color.mOnSurface
+                    color: mouseArea.containsMouse ? "black" : Color.mOnSurface
                 }
             }
         }
