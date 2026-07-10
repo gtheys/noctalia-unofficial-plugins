@@ -48,15 +48,33 @@ function emptyUsage() {
         providerId: "",
         primaryPercent: -1,
         secondaryPercent: -1,
+        tertiaryPercent: -1,
         primaryWindowMinutes: 0,
         secondaryWindowMinutes: 0,
+        tertiaryWindowMinutes: 0,
         primaryResetAt: "",
         secondaryResetAt: "",
+        tertiaryResetAt: "",
         primaryReset: "",
         secondaryReset: "",
+        tertiaryReset: "",
         creditsRemaining: 0,
         creditEventsCount: 0
     }
+}
+
+// AIDEV-NOTE: codexbar's JSON never names its metrics ("Tokens", "MCP", "Credits"...) —
+// those labels only exist in its text output. Map them here per provider, in the
+// order [shortWindow-slot, longWindow-slot, leftover-slot] matching parseUsage below.
+// Unlisted providers fall back to the generic "5h limit"/"Weekly limit" wording.
+var CARD_TITLES = {
+    zai: ["5-hour", "Tokens", "MCP"],
+    opencodego: ["5-hour", "Weekly", "Monthly"],
+    openrouter: ["Credits", "", ""]
+}
+
+function cardTitles(providerId) {
+    return CARD_TITLES[providerId] || ["5h limit", "Weekly limit", ""]
 }
 
 function parseUsage(output) {
@@ -121,14 +139,28 @@ function parseUsage(output) {
             longWindow = usage.secondary || usage.primary || {}
         }
 
+        // Whichever candidate window wasn't claimed as short/long is the 3rd metric
+        // (e.g. zai's "MCP", opencodego's "Monthly"). Reference-compare, not value-compare.
+        var leftoverWindow = {}
+        for (var k = 0; k < candidateWindows.length; k++) {
+            if (candidateWindows[k] !== shortWindow && candidateWindows[k] !== longWindow) {
+                leftoverWindow = candidateWindows[k]
+                break
+            }
+        }
+
         result.primaryPercent = Number(valueOrFallback(shortWindow.usedPercent, -1))
         result.secondaryPercent = Number(valueOrFallback(longWindow.usedPercent, -1))
+        result.tertiaryPercent = Number(valueOrFallback(leftoverWindow.usedPercent, -1))
         result.primaryWindowMinutes = Number(valueOrFallback(shortWindow.windowMinutes, 0))
         result.secondaryWindowMinutes = Number(valueOrFallback(longWindow.windowMinutes, 0))
+        result.tertiaryWindowMinutes = Number(valueOrFallback(leftoverWindow.windowMinutes, 0))
         result.primaryResetAt = shortWindow.resetsAt || ""
         result.secondaryResetAt = longWindow.resetsAt || ""
+        result.tertiaryResetAt = leftoverWindow.resetsAt || ""
         result.primaryReset = shortWindow.resetDescription || ""
         result.secondaryReset = longWindow.resetDescription || ""
+        result.tertiaryReset = leftoverWindow.resetDescription || ""
         return result
     } catch (e) {
         result.error = "parse failed: " + e

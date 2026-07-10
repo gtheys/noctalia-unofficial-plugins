@@ -28,7 +28,16 @@ Item {
         if (i >= 0 && root.currentProvider !== "") {
             var c = cmd.slice()
             c[i + 1] = root.currentProvider
-            return c
+            cmd = c
+        }
+        // AIDEV-NOTE: opencodego only supports --source auto (api/cli/oauth/web all error).
+        // Force it regardless of the user's global codexbarSource setting.
+        if (root.currentProvider === "opencodego") {
+            var s = cmd.indexOf("--source")
+            if (s >= 0) {
+                cmd = cmd.slice()
+                cmd[s + 1] = "auto"
+            }
         }
         return cmd
     }
@@ -55,14 +64,22 @@ Item {
     property string providerId: ""
     property int primaryPercent: -1
     property int secondaryPercent: -1
+    property int tertiaryPercent: -1
     property int primaryWindowMinutes: 0
     property int secondaryWindowMinutes: 0
+    property int tertiaryWindowMinutes: 0
     property string primaryResetAt: ""
     property string secondaryResetAt: ""
+    property string tertiaryResetAt: ""
     property string primaryReset: ""
     property string secondaryReset: ""
+    property string tertiaryReset: ""
     property int creditsRemaining: 0
     property int creditEventsCount: 0
+
+    // AIDEV-NOTE: per-provider card titles ("Tokens"/"MCP"/"Credits"...) since codexbar's
+    // JSON doesn't name metrics — see CARD_TITLES in codexbar.js.
+    readonly property var cardTitles: CodexBar.cardTitles(root.providerId)
 
     Component.onCompleted: {
         if (pluginApi && pluginApi.pluginSettings && pluginApi.pluginSettings.provider)
@@ -118,12 +135,16 @@ Item {
         providerId = parsed.providerId
         primaryPercent = parsed.primaryPercent
         secondaryPercent = parsed.secondaryPercent
+        tertiaryPercent = parsed.tertiaryPercent
         primaryWindowMinutes = parsed.primaryWindowMinutes
         secondaryWindowMinutes = parsed.secondaryWindowMinutes
+        tertiaryWindowMinutes = parsed.tertiaryWindowMinutes
         primaryResetAt = parsed.primaryResetAt
         secondaryResetAt = parsed.secondaryResetAt
+        tertiaryResetAt = parsed.tertiaryResetAt
         primaryReset = parsed.primaryReset
         secondaryReset = parsed.secondaryReset
+        tertiaryReset = parsed.tertiaryReset
         creditsRemaining = parsed.creditsRemaining
         creditEventsCount = parsed.creditEventsCount
         errorText = ""
@@ -263,19 +284,18 @@ Item {
                 }
 
                 ProviderChip {
-                    key: "codex"
-                    label: "Codex"
-                    icon: "brand-openai"
-                    percent: root.currentProvider === "codex" ? root.primaryPercent : -1
+                    key: "opencodego"
+                    label: "OpenCode"
+                    icon: "terminal-2"
+                    percent: root.currentProvider === "opencodego" ? root.primaryPercent : -1
                     Layout.fillWidth: true
                 }
 
                 ProviderChip {
-                    key: "copilot"
-                    label: "Copilot"
-                    icon: "brand-github-copilot"
-                    percent: root.currentProvider === "copilot" ? root.primaryPercent : -1
-                    planLabel: root.currentProvider === "copilot" && root.loginMethod !== "" ? root.loginMethod : ""
+                    key: "openrouter"
+                    label: "OpenRouter"
+                    icon: "route"
+                    percent: root.currentProvider === "openrouter" ? root.primaryPercent : -1
                     Layout.fillWidth: true
                 }
             }
@@ -305,7 +325,8 @@ Item {
 
             LimitCard {
                 Layout.fillWidth: true
-                title: "5h limit"
+                visible: root.cardTitles[0] !== "" && root.primaryPercent >= 0
+                title: root.cardTitles[0]
                 subtitle: root.windowLabel(root.primaryWindowMinutes)
                 percent: root.primaryPercent
                 resetShort: root.primaryReset
@@ -315,12 +336,24 @@ Item {
 
             LimitCard {
                 Layout.fillWidth: true
-                title: "Weekly limit"
+                visible: root.cardTitles[1] !== "" && root.secondaryPercent >= 0
+                title: root.cardTitles[1]
                 subtitle: root.windowLabel(root.secondaryWindowMinutes)
                 percent: root.secondaryPercent
                 resetShort: root.secondaryReset
                 resetFull: root.formatDateTime(root.secondaryResetAt)
                 barColor: root.usageColor(root.secondaryPercent)
+            }
+
+            LimitCard {
+                Layout.fillWidth: true
+                visible: root.cardTitles[2] !== "" && root.tertiaryPercent >= 0
+                title: root.cardTitles[2]
+                subtitle: root.windowLabel(root.tertiaryWindowMinutes)
+                percent: root.tertiaryPercent
+                resetShort: root.tertiaryReset
+                resetFull: root.formatDateTime(root.tertiaryResetAt)
+                barColor: root.usageColor(root.tertiaryPercent)
             }
 
             Rectangle {
