@@ -28,9 +28,16 @@ Item {
     property string primaryReset: ""
     property string secondaryReset: ""
     property string accountEmail: ""
+    property string providerId: ""
     property string statusText: "…"
     property string errorText: ""
     property bool loading: false
+
+    // AIDEV-NOTE: per-provider labels (openrouter has no 5h/weekly window, only Credits)
+    // — see barShortTitles/cardTitles in codexbar.js.
+    readonly property var shortTitles: CodexBar.barShortTitles(root.providerId)
+    readonly property var fullTitles: CodexBar.cardTitles(root.providerId)
+    readonly property bool hasSecondary: shortTitles[1] !== "" && secondaryPercent >= 0
 
     readonly property string displayText: {
         if (loading && primaryPercent < 0)
@@ -51,9 +58,9 @@ Item {
         if (accountEmail !== "")
             tip += " — " + accountEmail;
         if (primaryPercent >= 0)
-            tip += "\n5h: " + primaryPercent + "%" + (primaryReset !== "" ? " · resets " + primaryReset : "");
-        if (secondaryPercent >= 0)
-            tip += "\nWeekly: " + secondaryPercent + "%" + (secondaryReset !== "" ? " · resets " + secondaryReset : "");
+            tip += "\n" + fullTitles[0] + ": " + primaryPercent + "%" + (primaryReset !== "" ? " · resets " + primaryReset : "");
+        if (hasSecondary)
+            tip += "\n" + fullTitles[1] + ": " + secondaryPercent + "%" + (secondaryReset !== "" ? " · resets " + secondaryReset : "");
         return tip;
     }
 
@@ -118,6 +125,7 @@ Item {
             return;
         }
         accountEmail = usage.accountEmail;
+        providerId = usage.providerId;
         primaryPercent = usage.primaryPercent;
         secondaryPercent = usage.secondaryPercent;
         primaryReset = usage.primaryReset;
@@ -177,7 +185,7 @@ Item {
                     Layout.alignment: Qt.AlignVCenter
 
                     NText {
-                        text: pluginApi?.tr("bar.primary-short")
+                        text: root.shortTitles[0]
                         pointSize: root.meterFontSize
                         applyUiScale: false
                         font.weight: Style.fontWeightSemiBold
@@ -195,7 +203,8 @@ Item {
                     }
 
                     NText {
-                        text: pluginApi?.tr("bar.secondary-short")
+                        visible: root.hasSecondary
+                        text: root.shortTitles[1]
                         pointSize: root.meterFontSize
                         applyUiScale: false
                         font.weight: Style.fontWeightSemiBold
@@ -205,6 +214,7 @@ Item {
                     }
 
                     NLinearGauge {
+                        visible: root.hasSecondary
                         orientation: Qt.Vertical
                         ratio: root.clampPercent(root.secondaryPercent) / 100
                         fillColor: root.usageColor(root.secondaryPercent)
@@ -233,7 +243,7 @@ Item {
                     Layout.alignment: Qt.AlignHCenter
 
                     NText {
-                        text: pluginApi?.tr("bar.primary-short")
+                        text: root.shortTitles[0]
                         pointSize: root.meterFontSize
                         applyUiScale: false
                         font.weight: Style.fontWeightSemiBold
@@ -250,11 +260,12 @@ Item {
                 }
 
                 RowLayout {
+                    visible: root.hasSecondary
                     spacing: Style.marginXS
                     Layout.alignment: Qt.AlignHCenter
 
                     NText {
-                        text: pluginApi?.tr("bar.secondary-short")
+                        text: root.shortTitles[1]
                         pointSize: root.meterFontSize
                         applyUiScale: false
                         font.weight: Style.fontWeightSemiBold

@@ -82,6 +82,19 @@ function cardTitles(providerId) {
     return CARD_TITLES[providerId] || ["5h limit", "Weekly limit", ""]
 }
 
+// AIDEV-NOTE: abbreviated versions of CARD_TITLES for the narrow bar widget
+// (e.g. "Tokens" -> "Tok"). Empty string means "no such metric, hide it" —
+// e.g. openrouter only has Credits, no 5h/weekly window.
+var BAR_SHORT_TITLES = {
+    zai: ["5h", "Tok", "MCP"],
+    opencodego: ["5h", "Wk", "Mo"],
+    openrouter: ["Cr", "", ""]
+}
+
+function barShortTitles(providerId) {
+    return BAR_SHORT_TITLES[providerId] || ["5h", "W", ""]
+}
+
 function parseUsage(output) {
     var result = emptyUsage()
     try {

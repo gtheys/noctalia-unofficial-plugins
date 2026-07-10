@@ -430,7 +430,7 @@ Item {
             NText {
                 text: chip.label
                 pointSize: Style.fontSizeS
-                font.weight: chip.active ? Style.fontWeightBold : Style.fontWeightNormal
+                font.weight: chip.active ? Style.fontWeightBold : Style.fontWeightRegular
                 color: chip.active ? Color.mOnPrimary : Color.mOnSurfaceVariant
                 Layout.alignment: Qt.AlignHCenter
 
